@@ -1,56 +1,66 @@
-# name: Docker Image CI
-
-# on:
-#   push:
-#     branches: [ "master" ]
-#   pull_request:
-#     branches: [ "master" ]
-
-# env:
-#   # Use docker.io for Docker Hub if empty
-#   REGISTRY: docker.io
-#   # github.repository as <account>/<repo>
-#   IMAGE_NAME: ${{ github.repository }}
-
-# jobs:
-
-#   build:
-
-#     runs-on: ubuntu-latest
-
-#     steps:
-#     - uses: actions/checkout@v3
-#     - name: Build the Docker image
-#       run: docker build . --file Dockerfile --tag learning-docker
-
-
-name: Publish Docker image
+name: Docker Image CI
 
 on:
   push:
     branches: [ "master" ]
-  # release:
-  #   types: [published]
+  pull_request:
+    branches: [ "master" ]
+
+env:
+  # Use docker.io for Docker Hub if empty
+  REGISTRY: docker.io
+  # github.repository as <account>/<repo>
+  IMAGE_NAME: ${{ github.repository }}
 
 jobs:
-  docker:
+
+  build:
+
     runs-on: ubuntu-latest
+
     steps:
-      -
-        name: Set up QEMU
-        uses: docker/setup-qemu-action@v2
-      -
-        name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2
-      -
-        name: Login to Docker Hub
-        uses: docker/login-action@v2
-        with:
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_TOKEN }}
-      -
-        name: Build and push
-        uses: docker/build-push-action@v3
-        with:
-          push: true
-          tags: user/app:latest
+    - uses: actions/checkout@v3
+
+    - name: Login to Docker Hub
+      uses: docker/login-action@v2
+      with:
+        username: ${{ secrets.DOCKER_USERNAME }}
+        password: ${{ secrets.DOCKER_TOKEN }}
+    
+    - name: Build the Docker image
+      run: |
+        docker build . --file Dockerfile --tag learning-docker
+        docker push rccj/learning-docker
+
+
+
+# name: Publish Docker image
+
+# on:
+#   push:
+#     branches: [ "master" ]
+#   # release:
+#   #   types: [published]
+
+# jobs:
+#   docker:
+#     runs-on: ubuntu-latest
+#     steps:
+#       -
+#         name: Set up QEMU
+#         uses: docker/setup-qemu-action@v2
+#       -
+#         name: Set up Docker Buildx
+#         uses: docker/setup-buildx-action@v2
+#       -
+#         name: Login to Docker Hub
+#         uses: docker/login-action@v2
+#         with:
+#           username: ${{ secrets.DOCKER_USERNAME }}
+#           password: ${{ secrets.DOCKER_TOKEN }}
+#       -
+#         name: Build and push
+#         uses: docker/build-push-action@v3
+#         with:
+#           push: true
+#           tags: user/app:latest
